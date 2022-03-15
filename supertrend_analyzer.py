@@ -125,17 +125,17 @@ st.sidebar.subheader('Single Stocks')
 name = st.sidebar.selectbox('Select a stock', [x[1] for x in symbols_list])
 symbol = [x[0] for x in symbols_list if x[1] == name][0]
 
-
-plt.clf()
-df, plt, fig = calculateSuperTrend(symbol, name, 'seaborn-whitegrid')
-if (df.iloc[-1,:]['Supertrend'] == True) & (df.iloc[-2,:]['Supertrend'] == False):
-    message=f'Buy signal for {name}. New bullish supertrend detected.'
-elif (df.iloc[-1,:]['Supertrend'] == False) & (df.iloc[-2,:]['Supertrend'] == True):
-    message=f'Sell signal for {name}. New bearish supertrend detected.'
-else:
-    if df.iloc[-1,:]['Supertrend'] == True:
-        message=f'{name} is currently bullish. \n**Stop:** {int(df.iloc[-1,:]["Final Lowerband"]*100)/100}'
+if st.button('Generate'):
+    plt.clf()
+    df, plt, fig = calculateSuperTrend(symbol, name, 'seaborn-whitegrid')
+    if (df.iloc[-1,:]['Supertrend'] == True) & (df.iloc[-2,:]['Supertrend'] == False):
+        message=f'Buy signal for {name}. New bullish supertrend detected.'
+    elif (df.iloc[-1,:]['Supertrend'] == False) & (df.iloc[-2,:]['Supertrend'] == True):
+        message=f'Sell signal for {name}. New bearish supertrend detected.'
     else:
-        message=f'{name} is currently bearish. \n**Stop:** {int(df.iloc[-1,:]["Final Upperband"]*100)/100}'
-st.subheader(message)
-st.pyplot(fig)
+        if df.iloc[-1,:]['Supertrend'] == True:
+            message=f'{name} is currently bullish. \n**Stop:** {int(df.iloc[-1,:]["Final Lowerband"]*100)/100}'
+        else:
+            message=f'{name} is currently bearish. \n**Stop:** {int(df.iloc[-1,:]["Final Upperband"]*100)/100}'
+    st.subheader(message)
+    st.pyplot(fig)
