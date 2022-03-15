@@ -1,5 +1,3 @@
-import streamlit as st
-
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -116,26 +114,50 @@ def calculateSuperTrend(symbol, symbol_name, style, plot = True, weeks = 52, atr
     fig = None
   return df, plt, fig
 
+class analyzer:
+    def __init__(self, st):
+        symbols_list = [('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TSLA','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
+        TrendList = []
+        for symbol in symbols_list:
+            df, plt, fig = calculateSuperTrend(symbol[0], symbol[1], 'ggplot', plot = False, weeks = 52, atr_period = 10, atr_multiplier = 3)
+            try:
+                if df.iloc[-1]['Supertrend'] != df.iloc[-2]['Supertrend']:
+                        # determine the trend to be either up or down
+                        if df.iloc[-1]['Supertrend'] == True:
+                            trend = 'Up'
+                        else:
+                            trend = 'Down'
+                        # add symbol, name, trend
+                        TrendList.append([symbol[0], symbol[1], trend])
+            except:
+                print('Error with symbol ' + symbol[0])
+        # convert trendlist to dataframe
+        TrendList = pd.DataFrame(TrendList, columns = ['Symbol', 'Name', 'Trend'])
+        with st.expander(f'New Supertrends ({len(TrendList)})'):
+            st.write('Changes in trends that have been identified within the last 24 hours:')
+            st.table(TrendList)
+        
+        with st.sidebar.expander('Supertrend Analyzer'):
+            # describes the supertrend indicator in stock market analysis
+            st.write('Supertrend indicator is a technical analysis tool that uses a moving average to identify the trend direction of a security. It is a combination of the SMA and the ATR.')
+            self.name = st.selectbox('Select a stock', [x[1] for x in symbols_list])
+            self.symbol = [x[0] for x in symbols_list if x[1] == self.name][0]
+            show_supertrend = st.checkbox('Show Supertrend')
+        if show_supertrend:
+            self.plot(st)
 
-symbols_list = [('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TSLA','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('4GLD.SG','Xetra-Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
-
-st.sidebar.title("Supertrend Analyzer")
-
-st.sidebar.subheader('Single Stocks')
-name = st.sidebar.selectbox('Select a stock', [x[1] for x in symbols_list])
-symbol = [x[0] for x in symbols_list if x[1] == name][0]
-
-if st.button('Generate'):
-    plt.clf()
-    df, plt, fig = calculateSuperTrend(symbol, name, 'seaborn-whitegrid')
-    if (df.iloc[-1,:]['Supertrend'] == True) & (df.iloc[-2,:]['Supertrend'] == False):
-        message=f'Buy signal for {name}. New bullish supertrend detected.'
-    elif (df.iloc[-1,:]['Supertrend'] == False) & (df.iloc[-2,:]['Supertrend'] == True):
-        message=f'Sell signal for {name}. New bearish supertrend detected.'
-    else:
-        if df.iloc[-1,:]['Supertrend'] == True:
-            message=f'{name} is currently bullish. \n**Stop:** {int(df.iloc[-1,:]["Final Lowerband"]*100)/100}'
+    def plot(self, st):
+        print("clicked")
+        #plt.clf()
+        df, plt, fig = calculateSuperTrend(self.symbol, self.name, 'seaborn-whitegrid')
+        if (df.iloc[-1,:]['Supertrend'] == True) & (df.iloc[-2,:]['Supertrend'] == False):
+            message=f'Buy signal for {self.name}. New bullish supertrend detected.'
+        elif (df.iloc[-1,:]['Supertrend'] == False) & (df.iloc[-2,:]['Supertrend'] == True):
+            message=f'Sell signal for {self.name}. New bearish supertrend detected.'
         else:
-            message=f'{name} is currently bearish. \n**Stop:** {int(df.iloc[-1,:]["Final Upperband"]*100)/100}'
-    st.subheader(message)
-    st.pyplot(fig)
+            if df.iloc[-1,:]['Supertrend'] == True:
+                message=f'{self.name} is currently bullish. \n**Stop:** {int(df.iloc[-1,:]["Final Lowerband"]*100)/100}'
+            else:
+                message=f'{self.name} is currently bearish. \n**Stop:** {int(df.iloc[-1,:]["Final Upperband"]*100)/100}'
+        st.subheader(message)
+        st.pyplot(fig)
