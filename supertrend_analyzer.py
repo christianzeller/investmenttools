@@ -116,7 +116,7 @@ def calculateSuperTrend(symbol, symbol_name, style, plot = True, weeks = 52, atr
 
 class analyzer:
     def __init__(self, st):
-        symbols_list = [('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TSLA','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
+        symbols_list = [('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TL0.DE','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
         TrendList = []
         for symbol in symbols_list:
             df, plt, fig = calculateSuperTrend(symbol[0], symbol[1], 'ggplot', plot = False, weeks = 52, atr_period = 10, atr_multiplier = 3)
