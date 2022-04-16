@@ -116,7 +116,21 @@ def calculateSuperTrend(symbol, symbol_name, style, plot = True, weeks = 52, atr
 
 class analyzer:
     def __init__(self, st):
-        symbols_list = [('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TL0.DE','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
+        symbols_list = [('UI4L.F','UniGlobal -net-'),('UI1IL.DU', 'UniRak -net-'),('UIVE.MU','UniMarktführer -net- A'),('^GDAXI', 'DAX'), ('BTC-EUR','Bitcoin'), ('ETH-EUR','Ethereum'), ('LIN.DE','Linde plc'), ('TL0.DE','Tesla'), ('VWRL.AS','FTSE All-World'), ('IBC0.F','MSCI Europe'), ('GC=F','Gold'), ('CL=F', 'Crude Oil'), ('ZB=F','U.S. Treasury Bond Futures'), ('MSF.DE','Microsoft'),('FB2A.F','Facebook'), ('NFC.DE','Netflix'),('NVD.DE','NVIDIA'), ('ASML.AS','ASML'),('APC.F','Apple'),('GOOG','Google'),('^GSPC','S&P 500'),('C090.DE','LYXOR COMMO EX AGRI ETF I'),('SPYV.DE','SPDR S&P EME.MKTS DIV.ARIS.ETF')]
+       
+        with st.sidebar.expander('Supertrend Analyzer'):
+            # describes the supertrend indicator in stock market analysis
+            st.write('Supertrend indicator is a technical analysis tool that uses a moving average to identify the trend direction of a security. It is a combination of the SMA and the ATR.')
+            self.name = st.selectbox('Select a stock', [x[1] for x in symbols_list])
+            show_supertrend = st.checkbox('Show Supertrend')
+            show_trend_list = st.checkbox('Show Trend List')
+        if show_supertrend:
+            self.symbol = [x[0] for x in symbols_list if x[1] == self.name][0]
+            self.plot(st)
+        if show_trend_list:
+            self.show_trends(st, symbols_list)
+
+    def show_trends(self, st, symbols_list):
         TrendList = []
         for symbol in symbols_list:
             df, plt, fig = calculateSuperTrend(symbol[0], symbol[1], 'ggplot', plot = False, weeks = 52, atr_period = 10, atr_multiplier = 3)
@@ -136,18 +150,9 @@ class analyzer:
         with st.expander(f'New Supertrends ({len(TrendList)})'):
             st.write('Changes in trends that have been identified within the last 24 hours:')
             st.table(TrendList)
-        
-        with st.sidebar.expander('Supertrend Analyzer'):
-            # describes the supertrend indicator in stock market analysis
-            st.write('Supertrend indicator is a technical analysis tool that uses a moving average to identify the trend direction of a security. It is a combination of the SMA and the ATR.')
-            self.name = st.selectbox('Select a stock', [x[1] for x in symbols_list])
-            self.symbol = [x[0] for x in symbols_list if x[1] == self.name][0]
-            show_supertrend = st.checkbox('Show Supertrend')
-        if show_supertrend:
-            self.plot(st)
 
     def plot(self, st):
-        print("clicked")
+        #print("clicked")
         #plt.clf()
         df, plt, fig = calculateSuperTrend(self.symbol, self.name, 'seaborn-whitegrid')
         if (df.iloc[-1,:]['Supertrend'] == True) & (df.iloc[-2,:]['Supertrend'] == False):

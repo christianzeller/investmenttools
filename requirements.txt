@@ -3,3 +3,5 @@ mplfinance
 pandas
 numpy
 matplotlib
+quantstats
+riskfolio-lib
